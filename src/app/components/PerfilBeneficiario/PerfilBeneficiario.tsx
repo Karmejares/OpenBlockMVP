@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import Typography from "@mui/material/Typography";
 import RequestLoan from "./RequestLoan";
 import RequestedLoans from "./RequestedLoans";
 import SettleAccount from "./SettleAccount";
@@ -12,7 +13,7 @@ export interface Loan {
   amount: number;
   term: string;
   status: string;
-  requestDate: string; // Added requestDate
+  requestDate: string; // Date when the loan was requested
 }
 
 export default function PerfilBeneficiario() {
@@ -52,6 +53,8 @@ export default function PerfilBeneficiario() {
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
+
+  // Logic to update loans to "Atrasado" if they are overdue
 
   return (
     <Box
@@ -101,7 +104,10 @@ export default function PerfilBeneficiario() {
             {activeTab === 0 && (
               <RequestLoan
                 onRequestLoan={handleRequestLoan}
-                currentLoanCount={loans.length} // Pass the number of current loans
+                currentLoanCount={loans.length}
+                hasOverdueLoans={loans.some(
+                  (loan) => loan.status === "Atrasado"
+                )} // Check for overdue loans
               />
             )}
             {activeTab === 1 && (
@@ -131,20 +137,20 @@ export default function PerfilBeneficiario() {
       </Box>
 
       {/* Loan History Section */}
-        {history.length > 0 ? (
-            <Box
-                sx={{
-                    marginTop: 4,
-                    backgroundColor: "white",
-                    borderRadius: 2,
-                    boxShadow: 3,
-                    padding: 3,
-                    color: "black",
-                }}
-            >
-                <ZBeneficiaryHistory loans={history} />
-            </Box>
-        ) : null}
+      {history.length > 0 ? (
+        <Box
+          sx={{
+            marginTop: 4,
+            backgroundColor: "white",
+            borderRadius: 2,
+            boxShadow: 3,
+            padding: 3,
+            color: "black",
+          }}
+        >
+          <ZBeneficiaryHistory loans={history} />
+        </Box>
+      ) : null}
     </Box>
   );
 }

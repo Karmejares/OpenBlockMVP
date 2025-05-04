@@ -22,19 +22,21 @@ interface RequestLoanProps {
     requestDate: string;
   }) => void;
   currentLoanCount: number;
+  hasOverdueLoans: boolean; // New prop to check if there are overdue loans
 }
 
 const RequestLoan: React.FC<RequestLoanProps> = ({
-                                                   onRequestLoan,
-                                                   currentLoanCount,
-                                                 }) => {
+  onRequestLoan,
+  currentLoanCount,
+  hasOverdueLoans,
+}) => {
   const [amount, setAmount] = useState<number | "">("");
   const [termDays, setTermDays] = useState<number>(15);
   const [term, setTerm] = useState<string>("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
-      "success"
+    "success"
   );
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -63,6 +65,16 @@ const RequestLoan: React.FC<RequestLoanProps> = ({
       return;
     }
 
+    if (currentLoanCount >= 2) {
+      ErrorNotify("No puedes solicitar más de 2 préstamos.");
+      return;
+    }
+
+    if (currentLoanCount >= 2) {
+      ErrorNotify("No puedes solicitar más de 2 préstamos.");
+      return;
+    }
+
     if (amount && amount >= 100 && amount <= 1000) {
       const newLoan = {
         id: Date.now(),
@@ -84,9 +96,11 @@ const RequestLoan: React.FC<RequestLoanProps> = ({
       onRequestLoan(pendingLoan);
       SuccessNotify("Préstamo solicitado correctamente");
       setSnackbarMessage(
-          `Monto: $${pendingLoan.amount}\n` +
+        `Monto: $${pendingLoan.amount}\n` +
           `Plazo: ${pendingLoan.term}\n` +
-          `Tarifa: $${(pendingLoan.amount * serviceFeePercentage).toFixed(2)}\n` +
+          `Tarifa: $${(pendingLoan.amount * serviceFeePercentage).toFixed(
+            2
+          )}\n` +
           `Total a pagar: $${(pendingLoan.amount * 1.05).toFixed(2)}`
       );
       setSnackbarSeverity("success");
@@ -104,81 +118,81 @@ const RequestLoan: React.FC<RequestLoanProps> = ({
   };
 
   return (
-      <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-            padding: 4,
-            backgroundColor: "white",
-            borderRadius: 2,
-            boxShadow: 3,
-            maxWidth: 400,
-            margin: "auto",
-            color: "black",
-          }}
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        padding: 4,
+        backgroundColor: "white",
+        borderRadius: 2,
+        boxShadow: 3,
+        maxWidth: 400,
+        margin: "auto",
+        color: "black",
+      }}
+    >
+      <Typography variant="h6" textAlign="center">
+        Solicitar Préstamo
+      </Typography>
+
+      <TextField
+        label="Monto solicitado ($)"
+        type="number"
+        value={amount}
+        onChange={(e) => setAmount(Number(e.target.value))}
+        inputProps={{ min: 100, max: 1000 }}
+        fullWidth
+      />
+
+      <TextField
+        select
+        label="Plazo del préstamo"
+        value={termDays}
+        onChange={(e) => handleTermChange(Number(e.target.value))}
+        fullWidth
       >
-        <Typography variant="h6" textAlign="center">
-          Solicitar Préstamo
-        </Typography>
+        <MenuItem value={15}>15 días</MenuItem>
+        <MenuItem value={30}>30 días</MenuItem>
+      </TextField>
 
-        <TextField
-            label="Monto solicitado ($)"
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
-            inputProps={{ min: 100, max: 1000 }}
-            fullWidth
-        />
+      <Typography>
+        <strong>Tarifa por servicio:</strong> ${serviceFee.toFixed(2)}
+      </Typography>
+      <Typography>
+        <strong>Monto total a pagar:</strong> ${totalToPay.toFixed(2)}
+      </Typography>
 
-        <TextField
-            select
-            label="Plazo del préstamo"
-            value={termDays}
-            onChange={(e) => handleTermChange(Number(e.target.value))}
-            fullWidth
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleRequestLoan}
+        fullWidth
+        disabled={amount === "" || amount === null}
+      >
+        Solicitar Préstamo
+      </Button>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
         >
-          <MenuItem value={15}>15 días</MenuItem>
-          <MenuItem value={30}>30 días</MenuItem>
-        </TextField>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
 
-        <Typography>
-          <strong>Tarifa por servicio:</strong> ${serviceFee.toFixed(2)}
-        </Typography>
-        <Typography>
-          <strong>Monto total a pagar:</strong> ${totalToPay.toFixed(2)}
-        </Typography>
-
-        <Button
-            variant="contained"
-            color="primary"
-            onClick={handleRequestLoan}
-            fullWidth
-            disabled={amount === "" || amount === null}
-        >
-          Solicitar Préstamo
-        </Button>
-
-        <Snackbar
-            open={snackbarOpen}
-            autoHideDuration={6000}
-            onClose={handleSnackbarClose}
-            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <Alert
-              onClose={handleSnackbarClose}
-              severity={snackbarSeverity}
-              sx={{ width: "100%" }}
-          >
-            {snackbarMessage}
-          </Alert>
-        </Snackbar>
-
-        <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
-          <DialogTitle>Aceptar Términos</DialogTitle>
-          <FormularioAceptacion onAceptar={handleAceptar} />
-        </Dialog>
-      </Box>
+      <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
+        <DialogTitle>Aceptar Términos</DialogTitle>
+        <FormularioAceptacion onAceptar={handleAceptar} />
+      </Dialog>
+    </Box>
   );
 };
 

@@ -4,7 +4,9 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
-import {GenericToast} from "@/app/components/comun/GenericToast";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import { GenericToast } from "@/app/components/comun/GenericToast";
 
 interface Loan {
   id: number;
@@ -24,13 +26,29 @@ const SettleAccount: React.FC<SettleAccountProps> = ({
   onSettleAccount,
 }) => {
   const [selectedLoanId, setSelectedLoanId] = useState<number | "">("");
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
   const { SuccessNotify } = GenericToast();
   const handlePay = () => {
     if (selectedLoanId !== "") {
       onSettleAccount(selectedLoanId);
+      setSnackbarMessage(`Loan with ID ${selectedLoanId} successfully paid.`);
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
       SuccessNotify(`Loan with ID ${selectedLoanId} successfully paid.`);
       setSelectedLoanId(""); // Reset the selector
+    } else {
+      setSnackbarMessage("Please select a loan to pay.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   return (
@@ -62,15 +80,35 @@ const SettleAccount: React.FC<SettleAccountProps> = ({
             <MenuItem key={loan.id} value={loan.id}>
               {`ID: ${loan.id} - Amount: $${loan.amount.toFixed(2)} - Term: ${
                 loan.term
-              } days`}
+              }`}
             </MenuItem>
           ))}
       </TextField>
       <Button
-          disabled={selectedLoanId == null || selectedLoanId == ""}
-          variant="contained" color="primary" onClick={handlePay} fullWidth>
+        disabled={selectedLoanId == null || selectedLoanId == ""}
+        variant="contained"
+        color="primary"
+        onClick={handlePay}
+        fullWidth
+      >
         Pay Loan
       </Button>
+
+      {/* Snackbar for alerts */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
