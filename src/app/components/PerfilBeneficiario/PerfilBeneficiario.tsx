@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -54,24 +54,6 @@ export default function PerfilBeneficiario() {
   };
 
   // Logic to update loans to "Atrasado" if they are overdue
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLoans((prevLoans) =>
-        prevLoans.map((loan) => {
-          const dueDate = new Date(loan.requestDate);
-          const termDays = parseInt(loan.term.split(" ")[0], 10); // Extract the number of days from the term
-          dueDate.setDate(dueDate.getDate() + termDays);
-
-          if (loan.status === "Pendiente" && new Date() > dueDate) {
-            return { ...loan, status: "Atrasado" }; // Update status to "Atrasado"
-          }
-          return loan;
-        })
-      );
-    }, 86400000); // Check every 24 hours (24 * 60 * 60 * 1000 ms)
-
-    return () => clearInterval(interval); // Cleanup interval on component unmount
-  }, []);
 
   return (
     <Box
@@ -121,7 +103,10 @@ export default function PerfilBeneficiario() {
             {activeTab === 0 && (
               <RequestLoan
                 onRequestLoan={handleRequestLoan}
-                currentLoanCount={loans.length} // Pass the number of current loans
+                currentLoanCount={loans.length}
+                hasOverdueLoans={loans.some(
+                  (loan) => loan.status === "Atrasado"
+                )} // Check for overdue loans
               />
             )}
             {activeTab === 1 && (

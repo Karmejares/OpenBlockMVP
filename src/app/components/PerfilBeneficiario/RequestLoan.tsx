@@ -16,11 +16,13 @@ interface RequestLoanProps {
     requestDate: string;
   }) => void;
   currentLoanCount: number;
+  hasOverdueLoans: boolean; // New prop to check if there are overdue loans
 }
 
 const RequestLoan: React.FC<RequestLoanProps> = ({
   onRequestLoan,
   currentLoanCount,
+  hasOverdueLoans, // New prop to check if there are overdue loans
 }) => {
   const calculateDueDate = (days: number): string => {
     const dueDate = new Date();
@@ -50,6 +52,15 @@ const RequestLoan: React.FC<RequestLoanProps> = ({
   };
 
   const handleRequestLoan = () => {
+    if (hasOverdueLoans) {
+      setSnackbarMessage(
+        "No puedes solicitar un préstamo mientras tengas préstamos atrasados."
+      );
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
+
     if (currentLoanCount >= 2) {
       setSnackbarMessage("No puedes solicitar más de 2 préstamos.");
       setSnackbarSeverity("error");
