@@ -24,31 +24,38 @@ interface ZBeneficiaryHistoryProps {
 const ZBeneficiaryHistory: React.FC<ZBeneficiaryHistoryProps> = ({ loans }) => {
   return (
     <Box sx={{ marginTop: 4 }}>
-      <Typography variant="h6" sx={{ marginBottom: 2, color: "white" }}>
-        Historial de Préstamos
-      </Typography>
       {loans.length > 0 ? (
         <TableContainer component={Paper} sx={{ backgroundColor: "white" }}>
           <Table>
             <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Monto</TableCell>
-                <TableCell>Fecha de Solicitud</TableCell>
-                <TableCell>Plazo</TableCell>
-                <TableCell>Estado</TableCell>
+              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+                <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Monto</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>
+                  Fecha de Inicio
+                </TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Fecha de Fin</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Estado</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {loans.map((prestamo) => (
-                <TableRow key={prestamo.id}>
-                  <TableCell>{prestamo.id}</TableCell>
-                  <TableCell>${prestamo.amount.toFixed(2)}</TableCell>
-                  <TableCell>{prestamo.requestDate}</TableCell>
-                  <TableCell>{prestamo.term}</TableCell>
-                  <TableCell>{prestamo.status}</TableCell>
-                </TableRow>
-              ))}
+              {loans.map((loan) => {
+                // Calculate the end date based on the term
+                const startDate = new Date(loan.requestDate);
+                const termDays = parseInt(loan.term.split(" ")[0], 10);
+                const endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + termDays);
+
+                return (
+                  <TableRow key={loan.id}>
+                    <TableCell>{loan.id}</TableCell>
+                    <TableCell>${loan.amount.toFixed(2)}</TableCell>
+                    <TableCell>{startDate.toLocaleDateString()}</TableCell>
+                    <TableCell>{endDate.toLocaleDateString()}</TableCell>
+                    <TableCell>{loan.status}</TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>

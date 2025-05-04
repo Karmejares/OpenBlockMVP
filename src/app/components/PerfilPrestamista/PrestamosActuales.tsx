@@ -24,7 +24,6 @@ interface PrestamosActualesProps {
 const PrestamosActuales: React.FC<PrestamosActualesProps> = ({ prestamos }) => {
   return (
     <div>
-      <h2>Préstamos Actuales</h2>
       {prestamos.length > 0 ? (
         <TableContainer component={Paper}>
           <Table>
