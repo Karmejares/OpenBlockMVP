@@ -39,7 +39,13 @@ const RequestLoan: React.FC<RequestLoanProps> = ({
   );
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [pendingLoan, setPendingLoan] = useState<any>(null);
+  const [pendingLoan, setPendingLoan] = useState<null | {
+    id: number;
+    amount: number;
+    term: string;
+    status: string;
+    requestDate: string;
+  }>(null);
 
   const { SuccessNotify, ErrorNotify } = GenericToast();
 
