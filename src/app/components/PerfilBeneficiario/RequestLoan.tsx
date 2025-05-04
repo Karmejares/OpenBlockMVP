@@ -1,12 +1,17 @@
 import React, { useState } from "react";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
-import Button from "@mui/material/Button";
-import {GenericToast} from "@/app/components/comun/GenericToast";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+import {
+  Box,
+  Typography,
+  TextField,
+  MenuItem,
+  Button,
+  Snackbar,
+  Alert,
+  Dialog,
+  DialogTitle,
+} from "@mui/material";
+import FormularioAceptacion from "@/app/components/Forms/FormularioAceptacion";
+import { GenericToast } from "@/app/components/comun/GenericToast";
 
 interface RequestLoanProps {
   onRequestLoan: (loan: {
@@ -20,43 +25,41 @@ interface RequestLoanProps {
 }
 
 const RequestLoan: React.FC<RequestLoanProps> = ({
-  onRequestLoan,
-  currentLoanCount,
-}) => {
+                                                   onRequestLoan,
+                                                   currentLoanCount,
+                                                 }) => {
+  const [amount, setAmount] = useState<number | "">("");
+  const [termDays, setTermDays] = useState<number>(15);
+  const [term, setTerm] = useState<string>("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+      "success"
+  );
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [pendingLoan, setPendingLoan] = useState<any>(null);
+
+  const { SuccessNotify, ErrorNotify } = GenericToast();
+
   const calculateDueDate = (days: number): string => {
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + days);
     return dueDate.toLocaleDateString();
   };
-    const { SuccessNotify, ErrorNotify} = GenericToast();
-  const [amount, setAmount] = useState<number | "">("");
-  const [termDays, setTermDays] = useState<number>(15);
-  const [term, setTerm] = useState<string>(
-    `15 días (vence el ${calculateDueDate(15)})`
-  );
-  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
-  const [snackbarMessage, setSnackbarMessage] = useState<string>("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
-    "success"
-  );
 
   const serviceFeePercentage = 0.05;
   const serviceFee = amount ? amount * serviceFeePercentage : 0;
-
-  // Calculate the total amount to pay
   const totalToPay = amount ? amount + serviceFee : 0;
 
   const handleTermChange = (days: number) => {
     setTermDays(days);
-    const dueDateString = `${days} días (vence el ${calculateDueDate(days)})`;
-    setTerm(dueDateString);
+    setTerm(`${days} días (vence el ${calculateDueDate(days)})`);
   };
 
   const handleRequestLoan = () => {
     if (currentLoanCount >= 2) {
-      setSnackbarMessage("No puedes solicitar más de 2 préstamos.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+      ErrorNotify("No puedes solicitar más de 2 préstamos.");
       return;
     }
 
@@ -64,32 +67,35 @@ const RequestLoan: React.FC<RequestLoanProps> = ({
       const newLoan = {
         id: Date.now(),
         amount,
-        term,
+        term: `${termDays} días (vence el ${calculateDueDate(termDays)})`,
         status: "Pendiente",
         requestDate: new Date().toLocaleDateString(),
       };
-      onRequestLoan(newLoan);
+      setPendingLoan(newLoan);
+      setModalOpen(true);
+    } else {
+      ErrorNotify("Por favor, ingresa un monto válido entre $100 y $1000");
+    }
+  };
+
+  const handleAceptar = (firmaBase64: string) => {
+    if (pendingLoan) {
+      console.log("Firma capturada (base64):", firmaBase64);
+      onRequestLoan(pendingLoan);
+      SuccessNotify("Préstamo solicitado correctamente");
       setSnackbarMessage(
-        `Préstamo solicitado con éxito:\n\n` +
-          `Monto: $${amount.toFixed(2)}\n` +
-          `Plazo: ${term}\n` +
-          `Tarifa por servicio: $${serviceFee.toFixed(2)}\n` +
-          `Monto total a pagar: $${totalToPay.toFixed(2)}\n` +
-          `Fecha de solicitud: ${newLoan.requestDate}`
+          `Monto: $${pendingLoan.amount}\n` +
+          `Plazo: ${pendingLoan.term}\n` +
+          `Tarifa: $${(pendingLoan.amount * serviceFeePercentage).toFixed(2)}\n` +
+          `Total a pagar: $${(pendingLoan.amount * 1.05).toFixed(2)}`
       );
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
-      // Add logic here to send the request to the backend
+
+      setPendingLoan(null);
       setAmount("");
-      SuccessNotify("Prestamo solicitado correctamente");
       handleTermChange(15);
-    } else {
-      ErrorNotify("Por favor, ingresa un monto válido entre $100 y $1000");
-      setSnackbarMessage(
-        "Por favor, ingresa un monto válido entre $100 y $1000."
-      );
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+      setModalOpen(false);
     }
   };
 
@@ -98,73 +104,81 @@ const RequestLoan: React.FC<RequestLoanProps> = ({
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-        padding: 4,
-        backgroundColor: "white",
-        borderRadius: 2,
-        boxShadow: 3,
-        maxWidth: 400,
-        margin: "auto",
-        color: "black",
-      }}
-    >
-      <Typography variant="h6" sx={{ textAlign: "center" }}>
-        Solicitar Préstamo
-      </Typography>
-      <TextField
-        label="Monto solicitado ($)"
-        type="number"
-        value={amount}
-        onChange={(e) => setAmount(Number(e.target.value))}
-        inputProps={{ min: 100, max: 1000 }}
-        fullWidth
-      />
-      <TextField
-        select
-        label="Plazo del préstamo"
-        value={termDays}
-        onChange={(e) => handleTermChange(Number(e.target.value))}
-        fullWidth
+      <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            padding: 4,
+            backgroundColor: "white",
+            borderRadius: 2,
+            boxShadow: 3,
+            maxWidth: 400,
+            margin: "auto",
+            color: "black",
+          }}
       >
-        <MenuItem value={15}>15 días</MenuItem>
-        <MenuItem value={30}>30 días</MenuItem>
-      </TextField>
-      <Typography>
-        <strong>Tarifa por servicio:</strong> ${serviceFee.toFixed(2)}
-      </Typography>
-      <Typography>
-        <strong>Monto total a pagar:</strong> ${totalToPay.toFixed(2)}
-      </Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleRequestLoan}
-        fullWidth
-        disabled={amount == null || amount == ""}
-      >
-        Solicitar Préstamo
-      </Button>
+        <Typography variant="h6" textAlign="center">
+          Solicitar Préstamo
+        </Typography>
 
-      {/* Snackbar for alerts */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
+        <TextField
+            label="Monto solicitado ($)"
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(Number(e.target.value))}
+            inputProps={{ min: 100, max: 1000 }}
+            fullWidth
+        />
+
+        <TextField
+            select
+            label="Plazo del préstamo"
+            value={termDays}
+            onChange={(e) => handleTermChange(Number(e.target.value))}
+            fullWidth
         >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </Box>
+          <MenuItem value={15}>15 días</MenuItem>
+          <MenuItem value={30}>30 días</MenuItem>
+        </TextField>
+
+        <Typography>
+          <strong>Tarifa por servicio:</strong> ${serviceFee.toFixed(2)}
+        </Typography>
+        <Typography>
+          <strong>Monto total a pagar:</strong> ${totalToPay.toFixed(2)}
+        </Typography>
+
+        <Button
+            variant="contained"
+            color="primary"
+            onClick={handleRequestLoan}
+            fullWidth
+            disabled={amount === "" || amount === null}
+        >
+          Solicitar Préstamo
+        </Button>
+
+        <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={6000}
+            onClose={handleSnackbarClose}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+              onClose={handleSnackbarClose}
+              severity={snackbarSeverity}
+              sx={{ width: "100%" }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+
+        <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
+          <DialogTitle>Aceptar Términos</DialogTitle>
+          <FormularioAceptacion onAceptar={handleAceptar} />
+        </Dialog>
+      </Box>
   );
 };
 

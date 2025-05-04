@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
+import {GenericToast} from "@/app/components/comun/GenericToast";
 
 interface Loan {
   id: number;
@@ -23,14 +24,12 @@ const SettleAccount: React.FC<SettleAccountProps> = ({
   onSettleAccount,
 }) => {
   const [selectedLoanId, setSelectedLoanId] = useState<number | "">("");
-
+  const { SuccessNotify } = GenericToast();
   const handlePay = () => {
     if (selectedLoanId !== "") {
       onSettleAccount(selectedLoanId);
-      alert(`Loan with ID ${selectedLoanId} successfully paid.`);
+      SuccessNotify(`Loan with ID ${selectedLoanId} successfully paid.`);
       setSelectedLoanId(""); // Reset the selector
-    } else {
-      alert("Please select a loan to pay.");
     }
   };
 
@@ -67,7 +66,9 @@ const SettleAccount: React.FC<SettleAccountProps> = ({
             </MenuItem>
           ))}
       </TextField>
-      <Button variant="contained" color="primary" onClick={handlePay} fullWidth>
+      <Button
+          disabled={selectedLoanId == null || selectedLoanId == ""}
+          variant="contained" color="primary" onClick={handlePay} fullWidth>
         Pay Loan
       </Button>
     </Box>
