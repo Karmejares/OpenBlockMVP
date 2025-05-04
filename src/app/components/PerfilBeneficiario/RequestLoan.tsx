@@ -28,11 +28,10 @@ interface RequestLoanProps {
 const RequestLoan: React.FC<RequestLoanProps> = ({
   onRequestLoan,
   currentLoanCount,
-  hasOverdueLoans,
+  hasOverdueLoans, // Prop to check if there are overdue loans
 }) => {
   const [amount, setAmount] = useState<number | "">("");
   const [termDays, setTermDays] = useState<number>(15);
-  const [term, setTerm] = useState<string>("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
@@ -56,25 +55,32 @@ const RequestLoan: React.FC<RequestLoanProps> = ({
 
   const handleTermChange = (days: number) => {
     setTermDays(days);
-    setTerm(`${days} días (vence el ${calculateDueDate(days)})`);
   };
 
   const handleRequestLoan = () => {
-    if (currentLoanCount >= 2) {
-      ErrorNotify("No puedes solicitar más de 2 préstamos.");
+    // Check if the beneficiary has overdue loans
+    if (hasOverdueLoans) {
+      ErrorNotify(
+        "No puedes solicitar un préstamo mientras tengas préstamos atrasados."
+      );
+      setSnackbarMessage(
+        "No puedes solicitar un préstamo mientras tengas préstamos atrasados."
+      );
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
       return;
     }
 
+    // Check if the beneficiary already has 2 loans
     if (currentLoanCount >= 2) {
       ErrorNotify("No puedes solicitar más de 2 préstamos.");
+      setSnackbarMessage("No puedes solicitar más de 2 préstamos.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
       return;
     }
 
-    if (currentLoanCount >= 2) {
-      ErrorNotify("No puedes solicitar más de 2 préstamos.");
-      return;
-    }
-
+    // Validate the loan amount
     if (amount && amount >= 100 && amount <= 1000) {
       const newLoan = {
         id: Date.now(),
@@ -86,7 +92,12 @@ const RequestLoan: React.FC<RequestLoanProps> = ({
       setPendingLoan(newLoan);
       setModalOpen(true);
     } else {
-      ErrorNotify("Por favor, ingresa un monto válido entre $100 y $1000");
+      ErrorNotify("Por favor, ingresa un monto válido entre $100 y $1000.");
+      setSnackbarMessage(
+        "Por favor, ingresa un monto válido entre $100 y $1000."
+      );
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 

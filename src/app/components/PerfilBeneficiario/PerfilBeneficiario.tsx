@@ -137,20 +137,18 @@ export default function PerfilBeneficiario() {
       </Box>
 
       {/* Loan History Section */}
-      {history.length > 0 ? (
-        <Box
-          sx={{
-            marginTop: 4,
-            backgroundColor: "white",
-            borderRadius: 2,
-            boxShadow: 3,
-            padding: 3,
-            color: "black",
-          }}
-        >
-          <ZBeneficiaryHistory loans={history} />
-        </Box>
-      ) : null}
+      <Box
+        sx={{
+          padding: 4,
+          backgroundColor: "#1c1c1c",
+          borderTop: "1px solid #333",
+        }}
+      >
+        <Typography variant="h6" sx={{ marginBottom: 2 }}>
+          Historial de Pagos
+        </Typography>
+        <ZBeneficiaryHistory loans={history} />
+      </Box>
     </Box>
   );
 }
