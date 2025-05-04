@@ -155,11 +155,15 @@ const RequestLoan: React.FC<RequestLoanProps> = ({
 
       <TextField
         label="Monto solicitado ($)"
-        type="number"
+        fullWidth
         value={amount}
         onChange={(e) => setAmount(Number(e.target.value))}
-        inputProps={{ min: 100, max: 1000 }}
-        fullWidth
+        InputLabelProps={{
+          style: { color: "#000" }, // Color del label
+        }}
+        InputProps={{
+          style: { color: "#000" }, // Color del texto ingresado
+        }}
       />
 
       <TextField

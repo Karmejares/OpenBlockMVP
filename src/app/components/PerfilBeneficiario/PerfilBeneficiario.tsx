@@ -93,7 +93,7 @@ export default function PerfilBeneficiario() {
             value={activeTab}
             onChange={handleTabChange}
             variant="fullWidth"
-            textColor="primary"
+            textColor="#000000"
             indicatorColor="primary"
           >
             <Tab label="Request Loan" />

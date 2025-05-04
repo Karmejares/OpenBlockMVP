@@ -52,8 +52,8 @@ const PerfilPrestamista: React.FC<PerfilPrestamistaProps> = ({
             value={activeTab}
             onChange={handleTabChange}
             variant="fullWidth"
-            textColor="primary"
             indicatorColor="primary"
+            textColor="primary"
           >
             <Tab label="Depositar" />
             <Tab label="Retirar" />
