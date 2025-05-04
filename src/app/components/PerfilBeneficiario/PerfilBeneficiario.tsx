@@ -85,7 +85,7 @@ export default function PerfilBeneficiario() {
             borderRadius: 2,
             boxShadow: 3,
             padding: 3,
-            height: "70vh", // Ensure consistent height
+            height: "75vh", // Ensure consistent height
             color: "black",
           }}
         >
@@ -128,7 +128,7 @@ export default function PerfilBeneficiario() {
             borderRadius: 2,
             boxShadow: 3,
             padding: 3,
-            height: "70vh", // Ensure consistent height
+            height: "75vh", // Ensure consistent height
             color: "black",
           }}
         >
@@ -139,6 +139,7 @@ export default function PerfilBeneficiario() {
       {/* Loan History Section */}
       <Box
         sx={{
+          mt: 2,
           padding: 4,
           backgroundColor: "#1c1c1c",
           borderTop: "1px solid #333",
