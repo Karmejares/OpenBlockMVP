@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Divider from "@mui/material/Divider";
+import {GenericToast} from "@/app/components/comun/GenericToast";
 
 interface WalletOptionsProps {
   profileType: string;
@@ -16,13 +17,17 @@ const WalletOptions: React.FC<WalletOptionsProps> = ({
   accountBalance,
   setAccountBalance,
 }) => {
+
   const [depositAmount, setDepositAmount] = useState("");
+
+  const { SuccessNotify } = GenericToast()
 
   const handleDeposit = () => {
     const deposit = parseFloat(depositAmount);
     if (!isNaN(deposit) && deposit > 0) {
       setAccountBalance((prev) => prev + deposit); // Update balance in parent component
       setDepositAmount("");
+      SuccessNotify("Se ha depositado correctamente al saldo disponible")
     }
   };
 
@@ -82,6 +87,7 @@ const WalletOptions: React.FC<WalletOptionsProps> = ({
               variant="contained"
               color="primary"
               onClick={handleDeposit}
+              disabled={depositAmount == "" || depositAmount == null}
               fullWidth
             >
               Depositar

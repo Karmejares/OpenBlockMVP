@@ -4,8 +4,10 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
+import {GenericToast} from "@/app/components/comun/GenericToast";
 
 const RequestLoan: React.FC = () => {
+  const { SuccessNotify, ErrorNotify} = GenericToast();
   const [amount, setAmount] = useState<number | "">("");
   const [term, setTerm] = useState<number>(15); // Default term: 15 days
   const serviceFeePercentage = 0.05; // 5% fee
@@ -18,16 +20,12 @@ const RequestLoan: React.FC = () => {
 
   const handleRequestLoan = () => {
     if (amount && amount >= 100 && amount <= 1000) {
-      alert(
-        `Préstamo solicitado con éxito:\nMonto: $${amount}\nPlazo: ${term} días\nTarifa: $${serviceFee.toFixed(
-          2
-        )}\nTotal a pagar: $${totalToPay.toFixed(2)}`
-      );
       // Add logic here to send the request to the backend
       setAmount("");
       setTerm(15); // Reset term to default value
+      SuccessNotify("Prestamo solicitado correctamente");
     } else {
-      alert("Por favor, ingresa un monto válido entre $100 y $1000.");
+      ErrorNotify("Por favor, ingresa un monto válido entre $100 y $1000");
     }
   };
 
@@ -78,6 +76,7 @@ const RequestLoan: React.FC = () => {
         color="primary"
         onClick={handleRequestLoan}
         fullWidth
+        disabled={amount == null || amount == ""}
       >
         Solicitar Préstamo
       </Button>

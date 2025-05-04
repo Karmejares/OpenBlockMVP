@@ -33,6 +33,7 @@ const PerfilPrestamista: React.FC<PerfilPrestamistaProps> = ({
           justifyContent: "center",
           height: "50vh", // Ocupa la mitad superior de la pantalla
           padding: 4,
+          mb: 6
         }}
       >
         <Typography variant="h5" sx={{ marginBottom: 2 }}>

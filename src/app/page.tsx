@@ -9,15 +9,14 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Box from "@mui/material/Box";
 import MenuComponent from "./components/MenuComponent";
 import PerfilPrestamista from "./components/PerfilPrestamista/PerfilPrestamista";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
 import PerfilBeneficiario from "./components/PerfilBeneficiario/PerfilBeneficiario";
+import {ToastContainer} from "react-toastify";
 
 export default function Home() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [profileType, setProfileType] = useState("Perfil Prestamista");
   const [accountBalance, setAccountBalance] = useState(1000); // Monto inicial
-  const [activeTab, setActiveTab] = useState(0); // Tab activa para Depositar/Retirar
+  const [setActiveTab] = useState(0); // Tab activa para Depositar/Retirar
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -33,10 +32,6 @@ export default function Home() {
         ? "Perfil Prestamista"
         : "Perfil Beneficiario de Crédito"
     );
-  };
-
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
   };
 
   return (
@@ -78,6 +73,7 @@ export default function Home() {
       ) : (
         <PerfilBeneficiario />
       )}
+      <ToastContainer/>
     </Box>
   );
 }

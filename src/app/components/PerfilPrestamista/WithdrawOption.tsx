@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
+import {GenericToast} from "@/app/components/comun/GenericToast";
 
 interface WithdrawOptionProps {
   accountBalance: number;
@@ -14,13 +15,17 @@ const WithdrawOption: React.FC<WithdrawOptionProps> = ({
 }) => {
   const [withdrawAmount, setWithdrawAmount] = useState("");
 
+  const { ErrorNotify, SuccessNotify } = GenericToast();
+
   const handleWithdraw = () => {
     const withdraw = parseFloat(withdrawAmount);
     if (!isNaN(withdraw) && withdraw > 0 && withdraw <= accountBalance) {
       setAccountBalance((prev) => prev - withdraw);
       setWithdrawAmount("");
+      SuccessNotify(`Se ha retirado correctamente ${withdraw} a su cuenta`)
     } else {
-      alert("Monto inválido o insuficiente en la cuenta.");
+      ErrorNotify("No se puede retirar dinero, monto o saldo insuficiente")
+      setWithdrawAmount("");
     }
   };
 
@@ -65,6 +70,7 @@ const WithdrawOption: React.FC<WithdrawOptionProps> = ({
         color="secondary"
         onClick={handleWithdraw}
         sx={{ backgroundColor: "purple", color: "white" }}
+        disabled={withdrawAmount == null || withdrawAmount == ""}
       >
         Retirar
       </Button>
