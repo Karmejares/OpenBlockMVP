@@ -74,7 +74,13 @@ const PerfilPrestamista: React.FC<PerfilPrestamistaProps> = ({
           </Box>
         </Box>
       </Box>
-
+      <Box
+        sx={{
+            mb: 3,
+            height: "15px",
+            width: "100%",
+        }}
+      ></Box>
       {/* Historial de préstamos */}
       <Box
         sx={{
