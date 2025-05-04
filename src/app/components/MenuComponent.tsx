@@ -8,18 +8,20 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 interface MenuComponentProps {
   anchorEl: HTMLElement | null;
   handleMenuClose: () => void;
+  onWalletClick: () => void;
+  onProfileClick: () => void;
+  onStatisticsClick: () => void;
+  profileType: string;
 }
 
 const MenuComponent: React.FC<MenuComponentProps> = ({
   anchorEl,
   handleMenuClose,
+  onWalletClick,
+  onProfileClick,
+  onStatisticsClick,
+  profileType,
 }) => {
-  const handleStatisticsClick = () => {
-    // Aquí puedes manejar la lógica para mostrar las estadísticas
-
-    console.log("Mostrar estadísticas");
-    handleMenuClose(); // Cierra el menú después de hacer clic
-  };
   return (
     <Menu
       anchorEl={anchorEl}
@@ -27,23 +29,34 @@ const MenuComponent: React.FC<MenuComponentProps> = ({
       onClose={handleMenuClose}
     >
       <MenuItem
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
+        onClick={() => {
+          onProfileClick();
+          handleMenuClose();
         }}
       >
         <AccountCircleIcon sx={{ marginRight: 1 }} />
-        Profile
+        Perfil
       </MenuItem>
-      <MenuItem onClick={handleMenuClose}>
+      <MenuItem
+        onClick={() => {
+          onWalletClick();
+          handleMenuClose();
+        }}
+      >
         <AccountBalanceWalletIcon sx={{ marginRight: 1 }} />
         Wallet
       </MenuItem>
-      <MenuItem onClick={handleMenuClose}>
-        <BarChartIcon sx={{ marginRight: 1 }} />
-        Statistics
-      </MenuItem>
+      {profileType === "Perfil Prestamista" && (
+        <MenuItem
+          onClick={() => {
+            onStatisticsClick();
+            handleMenuClose();
+          }}
+        >
+          <BarChartIcon sx={{ marginRight: 1 }} />
+          Estadísticas
+        </MenuItem>
+      )}
     </Menu>
   );
 };
