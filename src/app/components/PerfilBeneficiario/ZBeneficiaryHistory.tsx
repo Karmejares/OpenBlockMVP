@@ -9,7 +9,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
-interface Prestamo {
+interface Loan {
   id: number;
   amount: number;
   requestDate: string;
@@ -18,7 +18,7 @@ interface Prestamo {
 }
 
 interface ZBeneficiaryHistoryProps {
-  loans: Prestamo[];
+  loans: Loan[];
 }
 
 const ZBeneficiaryHistory: React.FC<ZBeneficiaryHistoryProps> = ({ loans }) => {
