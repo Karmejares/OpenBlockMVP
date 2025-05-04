@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import {GenericToast} from "@/app/components/comun/GenericToast";
+import { repayLoan } from "@/app/web3Functions/loanContract";
 
 interface WithdrawOptionProps {
   accountBalance: number;
