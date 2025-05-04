@@ -66,49 +66,53 @@ export default function Home() {
         </Toolbar>
       </AppBar>
 
-      <Box sx={{ paddingTop: "64px", p: 2 }}>
-        <MenuComponent
-          anchorEl={anchorEl}
-          handleMenuClose={handleMenuClose}
-          onWalletClick={() => setActiveView("perfil")}
-          onProfileClick={() => setActiveView("usuario")}
-          onStatisticsClick={() => setActiveView("estadisticas")}
-          profileType={profileType}
-        />
+      <Box>
+        <Box sx={(theme) => theme.mixins.toolbar} />
 
-        {/* Vista activa */}
-        {activeView === "perfil" &&
-          (profileType === "Perfil Prestamista" ? (
-            <PerfilPrestamista
-              accountBalance={accountBalance}
-              setAccountBalance={setAccountBalance}
-            />
-          ) : (
-            <PerfilBeneficiario />
-          ))}
+        <Box sx={{ p: 2 }}>
+          {/* Eliminado el saldo duplicado */}
 
-        {activeView === "estadisticas" &&
-          profileType === "Perfil Prestamista" && (
-            <>
-              <Box textAlign="right" mb={2}>
-                <Button
-                  variant="outlined"
-                  color="inherit"
-                  onClick={() => setActiveView("perfil")}
-                >
-                  Volver
-                </Button>
-              </Box>
-              <Dashboard profileType={profileType} />
-            </>
+          <MenuComponent
+            anchorEl={anchorEl}
+            handleMenuClose={handleMenuClose}
+            onWalletClick={() => setActiveView("perfil")}
+            onProfileClick={() => setActiveView("usuario")}
+            onStatisticsClick={() => setActiveView("estadisticas")}
+            profileType={profileType}
+          />
+          <Box sx={{ p: 1 }}></Box>
+          {activeView === "perfil" &&
+            (profileType === "Perfil Prestamista" ? (
+              <PerfilPrestamista
+                accountBalance={accountBalance}
+                setAccountBalance={setAccountBalance}
+              />
+            ) : (
+              <PerfilBeneficiario />
+            ))}
+
+          {activeView === "estadisticas" &&
+            profileType === "Perfil Prestamista" && (
+              <>
+                <Box textAlign="right" mb={2}>
+                  <Button
+                    variant="outlined"
+                    color="inherit"
+                    onClick={() => setActiveView("perfil")}
+                  >
+                    Volver
+                  </Button>
+                </Box>
+                <Dashboard profileType={profileType} />
+              </>
+            )}
+
+          {activeView === "usuario" && (
+            <Box>
+              <Typography variant="h5">Perfil del Usuario</Typography>
+            </Box>
           )}
-
-        {activeView === "usuario" && (
-          <Box>
-            <Typography variant="h5">Perfil del Usuario</Typography>
-            {/* Puedes agregar aquí las configuraciones del usuario */}
-          </Box>
-        )}
+        </Box>
       </Box>
 
       <ToastContainer />

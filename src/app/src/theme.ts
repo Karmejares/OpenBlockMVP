@@ -1,10 +1,20 @@
 import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
-  palette: {
-    mode: "dark",
-    primary: {
-      main: "#1976d2",
+  components: {
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: "#000",
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        input: {
+          color: "#000",
+        },
+      },
     },
   },
 });
