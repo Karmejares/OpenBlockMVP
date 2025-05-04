@@ -83,44 +83,47 @@ export default function Home() {
           padding: 4,
         }}
       >
-        <Typography variant="h5" sx={{ marginBottom: 2 }}>
-          Saldo Actual: ${accountBalance.toFixed(2)}
-        </Typography>
-        <Box
-          sx={{
-            width: "100%",
-            maxWidth: 500,
-            backgroundColor: "white",
-            borderRadius: 2,
-            boxShadow: 3,
-            color: "black",
-          }}
-        >
-          <Tabs
-            value={activeTab}
-            onChange={handleTabChange}
-            variant="fullWidth"
-            textColor="primary"
-            indicatorColor="primary"
+        {profileType === "Perfil Prestamista" && (
+          <Typography variant="h5" sx={{ marginBottom: 2 }}>
+            Saldo Actual: ${accountBalance.toFixed(2)}
+          </Typography>
+        )}
+        {profileType === "Perfil Prestamista" && (
+          <Box
+            sx={{
+              width: "100%",
+              maxWidth: 500,
+              backgroundColor: "white",
+              borderRadius: 2,
+              color: "black",
+            }}
           >
-            <Tab label="Depositar" />
-            <Tab label="Retirar" />
-          </Tabs>
-          <Box sx={{ padding: 2 }}>
-            {activeTab === 0 ? (
-              <WalletOptions
-                profileType={profileType}
-                accountBalance={accountBalance}
-                setAccountBalance={setAccountBalance}
-              />
-            ) : (
-              <WithdrawOption
-                accountBalance={accountBalance}
-                setAccountBalance={setAccountBalance}
-              />
-            )}
+            <Tabs
+              value={activeTab}
+              onChange={handleTabChange}
+              variant="fullWidth"
+              textColor="primary"
+              indicatorColor="primary"
+            >
+              <Tab label="Depositar" />
+              <Tab label="Retirar" />
+            </Tabs>
+            <Box sx={{ padding: 2 }}>
+              {activeTab === 0 ? (
+                <WalletOptions
+                  profileType={profileType}
+                  accountBalance={accountBalance}
+                  setAccountBalance={setAccountBalance}
+                />
+              ) : (
+                <WithdrawOption
+                  accountBalance={accountBalance}
+                  setAccountBalance={setAccountBalance}
+                />
+              )}
+            </Box>
           </Box>
-        </Box>
+        )}
       </Box>
 
       {/* Historial de préstamos */}
@@ -137,8 +140,20 @@ export default function Home() {
           </Typography>
           <PrestamosActuales
             prestamos={[
-              { id: 1, monto: 500, fecha: "2023-10-01", estado: "Activo" },
-              { id: 2, monto: 300, fecha: "2023-10-05", estado: "Pagado" },
+              {
+                id: 1,
+                monto: 500,
+                fechaDeInicio: "2023-10-01",
+                fechaDeFin: "2023-11-01",
+                estado: "Activo",
+              },
+              {
+                id: 2,
+                monto: 300,
+                fechaDeInicio: "2023-10-05",
+                fechaDeFin: "2023-10-20",
+                estado: "Pagado",
+              },
             ]}
           />
         </Box>

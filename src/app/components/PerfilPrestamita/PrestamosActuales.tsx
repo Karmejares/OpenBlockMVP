@@ -12,7 +12,8 @@ import {
 interface Prestamo {
   id: number;
   monto: number;
-  fecha: string;
+  fechaDeInicio: string;
+  fechaDeFin: string;
   estado: string;
 }
 
@@ -31,7 +32,8 @@ const PrestamosActuales: React.FC<PrestamosActualesProps> = ({ prestamos }) => {
               <TableRow>
                 <TableCell>ID</TableCell>
                 <TableCell>Monto</TableCell>
-                <TableCell>Fecha</TableCell>
+                <TableCell>Fecha de Inicio</TableCell>
+                <TableCell>Fecha de Fin</TableCell>
                 <TableCell>Estado</TableCell>
               </TableRow>
             </TableHead>
@@ -40,7 +42,8 @@ const PrestamosActuales: React.FC<PrestamosActualesProps> = ({ prestamos }) => {
                 <TableRow key={prestamo.id}>
                   <TableCell>{prestamo.id}</TableCell>
                   <TableCell>${prestamo.monto.toFixed(2)}</TableCell>
-                  <TableCell>{prestamo.fecha}</TableCell>
+                  <TableCell>{prestamo.fechaDeInicio}</TableCell>
+                  <TableCell>{prestamo.fechaDeFin}</TableCell>
                   <TableCell>{prestamo.estado}</TableCell>
                 </TableRow>
               ))}
