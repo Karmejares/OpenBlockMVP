@@ -13,18 +13,18 @@ export interface Loan {
   amount: number;
   term: string;
   status: string;
-  requestDate: string; // Date when the loan was requested
+  requestDate: string;
 }
 
 export default function PerfilBeneficiario() {
   const [loans, setLoans] = useState<Loan[]>([]);
   const [history, setHistory] = useState<Loan[]>([]);
-  const [activeTab, setActiveTab] = useState(0); // Controls the active tab
+  const [activeTab, setActiveTab] = useState(0);
 
   const handleRequestLoan = (newLoan: Loan) => {
     const loanWithDate = {
       ...newLoan,
-      requestDate: new Date().toISOString(), // Add the current date as the request date
+      requestDate: new Date().toISOString(),
     };
     setLoans((prevLoans) => [...prevLoans, loanWithDate]);
   };
@@ -33,19 +33,16 @@ export default function PerfilBeneficiario() {
     setLoans((prevLoans) => {
       const paidLoan = prevLoans.find((loan) => loan.id === id);
       if (paidLoan) {
-        // Check if the loan is already in the history
         setHistory((prevHistory) => {
-          const isAlreadyInHistory = prevHistory.some(
+          const alreadyExists = prevHistory.some(
             (loan) => loan.id === paidLoan.id
           );
-          if (!isAlreadyInHistory) {
-            // Add the loan to the history only if it's not already there
+          if (!alreadyExists) {
             return [...prevHistory, { ...paidLoan, status: "Paid" }];
           }
-          return prevHistory; // Return the existing history if already present
+          return prevHistory;
         });
       }
-      // Remove the paid loan from the active loans list
       return prevLoans.filter((loan) => loan.id !== id);
     });
   };
@@ -53,8 +50,6 @@ export default function PerfilBeneficiario() {
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
-
-  // Logic to update loans to "Atrasado" if they are overdue
 
   return (
     <Box
@@ -66,7 +61,6 @@ export default function PerfilBeneficiario() {
         overflowY: "auto",
       }}
     >
-      {/* Active Loans Section */}
       <Box
         sx={{
           display: "flex",
@@ -76,7 +70,6 @@ export default function PerfilBeneficiario() {
           flexWrap: "wrap",
         }}
       >
-        {/* Tabs for Request Loan and Pay Loan */}
         <Box
           sx={{
             flex: 1,
@@ -85,7 +78,7 @@ export default function PerfilBeneficiario() {
             borderRadius: 2,
             boxShadow: 3,
             padding: 3,
-            height: "75vh", // Ensure consistent height
+            height: "75vh",
             color: "black",
           }}
         >
@@ -93,11 +86,11 @@ export default function PerfilBeneficiario() {
             value={activeTab}
             onChange={handleTabChange}
             variant="fullWidth"
-            textColor="#000000"
+            textColor="inherit"
             indicatorColor="primary"
           >
-            <Tab label="Request Loan" />
-            <Tab label="Pay Loan" />
+            <Tab label="Solicitar Préstamo" />
+            <Tab label="Pagar Préstamo" />
           </Tabs>
 
           <Box sx={{ marginTop: 2 }}>
@@ -105,21 +98,28 @@ export default function PerfilBeneficiario() {
               <RequestLoan
                 onRequestLoan={handleRequestLoan}
                 currentLoanCount={loans.length}
-                hasOverdueLoans={loans.some(
-                  (loan) => loan.status === "Atrasado"
-                )} // Check for overdue loans
+                hasOverdueLoans={loans.some((loan) => loan.status === "Atrasado")}
               />
             )}
             {activeTab === 1 && (
-              <SettleAccount
-                loans={loans}
-                onSettleAccount={handleSettleAccount}
-              />
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                {loans.length === 0 ? (
+                  <Typography>No tienes préstamos pendientes.</Typography>
+                ) : (
+                  loans.map((loan) => (
+                    <SettleAccount
+                      key={loan.id}
+                      loanId={loan.id}
+                      amount={loan.amount}
+                      onSettleAccount={() => handleSettleAccount(loan.id)}
+                    />
+                  ))
+                )}
+              </Box>
             )}
           </Box>
         </Box>
 
-        {/* Requested Loans */}
         <Box
           sx={{
             flex: 1,
@@ -128,15 +128,19 @@ export default function PerfilBeneficiario() {
             borderRadius: 2,
             boxShadow: 3,
             padding: 3,
-            height: "75vh", // Ensure consistent height
+            height: "75vh",
             color: "black",
           }}
         >
-          <RequestedLoans loans={loans} />
+          <RequestLoan
+            onRequestLoan={handleRequestLoan}
+            currentLoanCount={loans.length}
+            hasOverdueLoans={loans.some((loan) => loan.status === "Atrasado")}
+          />
+
         </Box>
       </Box>
 
-      {/* Loan History Section */}
       <Box
         sx={{
           mt: 2,
@@ -153,3 +157,5 @@ export default function PerfilBeneficiario() {
     </Box>
   );
 }
+
+

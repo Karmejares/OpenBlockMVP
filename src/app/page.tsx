@@ -1,5 +1,5 @@
 "use client";
-
+import { MoralisProvider } from "react-moralis";
 import React, { useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -42,80 +42,82 @@ export default function Home() {
   };
 
   return (
-    <Box sx={{ backgroundColor: "black", color: "white", minHeight: "100vh" }}>
-      <AppBar position="fixed" sx={{ backgroundColor: "black", zIndex: 1200 }}>
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={handleMenuOpen}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            NFT Whitelist DApp
-          </Typography>
-          <Button
-            onClick={toggleProfileType}
-            variant="outlined"
-            sx={{ color: "white", borderColor: "white" }}
-          >
-            {profileType}
-          </Button>
-        </Toolbar>
-      </AppBar>
+    <MoralisProvider initializeOnMount={false}>
+        <Box sx={{ backgroundColor: "black", color: "white", minHeight: "100vh" }}>
+        <AppBar position="fixed" sx={{ backgroundColor: "black", zIndex: 1200 }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={handleMenuOpen}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" sx={{ flexGrow: 1 }}>
+              NFT Whitelist DApp
+            </Typography>
+            <Button
+              onClick={toggleProfileType}
+              variant="outlined"
+              sx={{ color: "white", borderColor: "white" }}
+            >
+              {profileType}
+            </Button>
+          </Toolbar>
+        </AppBar>
 
-      <Box>
-        <Box sx={(theme) => theme.mixins.toolbar} />
+        <Box>
+          <Box sx={(theme) => theme.mixins.toolbar} />
 
-        <Box sx={{ p: 2 }}>
-          {/* Eliminado el saldo duplicado */}
+          <Box sx={{ p: 2 }}>
+            {/* Eliminado el saldo duplicado */}
 
-          <MenuComponent
-            anchorEl={anchorEl}
-            handleMenuClose={handleMenuClose}
-            onWalletClick={() => setActiveView("perfil")}
-            onProfileClick={() => setActiveView("usuario")}
-            onStatisticsClick={() => setActiveView("estadisticas")}
-            profileType={profileType}
-          />
-          <Box sx={{ p: 1 }}></Box>
-          {activeView === "perfil" &&
-            (profileType === "Perfil Prestamista" ? (
-              <PerfilPrestamista
-                accountBalance={accountBalance}
-                setAccountBalance={setAccountBalance}
-              />
-            ) : (
-              <PerfilBeneficiario />
-            ))}
+            <MenuComponent
+              anchorEl={anchorEl}
+              handleMenuClose={handleMenuClose}
+              onWalletClick={() => setActiveView("perfil")}
+              onProfileClick={() => setActiveView("usuario")}
+              onStatisticsClick={() => setActiveView("estadisticas")}
+              profileType={profileType}
+            />
+            <Box sx={{ p: 1 }}></Box>
+            {activeView === "perfil" &&
+              (profileType === "Perfil Prestamista" ? (
+                <PerfilPrestamista
+                  accountBalance={accountBalance}
+                  setAccountBalance={setAccountBalance}
+                />
+              ) : (
+                <PerfilBeneficiario />
+              ))}
 
-          {activeView === "estadisticas" &&
-            profileType === "Perfil Prestamista" && (
-              <>
-                <Box textAlign="right" mb={2}>
-                  <Button
-                    variant="outlined"
-                    color="inherit"
-                    onClick={() => setActiveView("perfil")}
-                  >
-                    Volver
-                  </Button>
-                </Box>
-                <Dashboard profileType={profileType} />
-              </>
+            {activeView === "estadisticas" &&
+              profileType === "Perfil Prestamista" && (
+                <>
+                  <Box textAlign="right" mb={2}>
+                    <Button
+                      variant="outlined"
+                      color="inherit"
+                      onClick={() => setActiveView("perfil")}
+                    >
+                      Volver
+                    </Button>
+                  </Box>
+                  <Dashboard profileType={profileType} />
+                </>
+              )}
+
+            {activeView === "usuario" && (
+              <Box>
+                <Typography variant="h5">Perfil del Usuario</Typography>
+              </Box>
             )}
-
-          {activeView === "usuario" && (
-            <Box>
-              <Typography variant="h5">Perfil del Usuario</Typography>
-            </Box>
-          )}
+          </Box>
         </Box>
-      </Box>
 
-      <ToastContainer />
-    </Box>
+        <ToastContainer />
+      </Box>
+    </MoralisProvider>
   );
 }

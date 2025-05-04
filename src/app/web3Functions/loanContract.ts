@@ -1,7 +1,7 @@
 // src/app/web3Functions/loanContract.ts
 
 import { BrowserProvider, Contract, parseEther } from "ethers";
-import abi from "../abis/LoanContract.json";
+import abi from "../constans/abis/AseguradoraContract.json";
 
 declare global {
   interface Window {
