@@ -4,6 +4,8 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 interface Loan {
   id: number;
@@ -23,15 +25,28 @@ const SettleAccount: React.FC<SettleAccountProps> = ({
   onSettleAccount,
 }) => {
   const [selectedLoanId, setSelectedLoanId] = useState<number | "">("");
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
 
   const handlePay = () => {
     if (selectedLoanId !== "") {
       onSettleAccount(selectedLoanId);
-      alert(`Loan with ID ${selectedLoanId} successfully paid.`);
+      setSnackbarMessage(`Loan with ID ${selectedLoanId} successfully paid.`);
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
       setSelectedLoanId(""); // Reset the selector
     } else {
-      alert("Please select a loan to pay.");
+      setSnackbarMessage("Please select a loan to pay.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   return (
@@ -63,13 +78,29 @@ const SettleAccount: React.FC<SettleAccountProps> = ({
             <MenuItem key={loan.id} value={loan.id}>
               {`ID: ${loan.id} - Amount: $${loan.amount.toFixed(2)} - Term: ${
                 loan.term
-              } days`}
+              }`}
             </MenuItem>
           ))}
       </TextField>
       <Button variant="contained" color="primary" onClick={handlePay} fullWidth>
         Pay Loan
       </Button>
+
+      {/* Snackbar for alerts */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
