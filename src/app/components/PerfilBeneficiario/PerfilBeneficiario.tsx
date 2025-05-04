@@ -7,35 +7,26 @@ import RequestedLoans from "./RequestedLoans";
 import SettleAccount from "./SettleAccount";
 import ZBeneficiaryHistory from "./ZBeneficiaryHistory";
 
-interface Loan {
+export interface Loan {
   id: number;
   amount: number;
-  requestDate: string;
   term: string;
   status: string;
+  requestDate: string; // Added requestDate
 }
 
-const initialLoans: Loan[] = [
-  {
-    id: 1,
-    amount: 500,
-    requestDate: "2023-10-01",
-    term: "15 days",
-    status: "Pending",
-  },
-  {
-    id: 2,
-    amount: 300,
-    requestDate: "2023-10-05",
-    term: "30 days",
-    status: "Pending",
-  },
-];
-
 export default function PerfilBeneficiario() {
-  const [loans, setLoans] = useState<Loan[]>(initialLoans);
+  const [loans, setLoans] = useState<Loan[]>([]);
   const [history, setHistory] = useState<Loan[]>([]);
   const [activeTab, setActiveTab] = useState(0); // Controls the active tab
+
+  const handleRequestLoan = (newLoan: Loan) => {
+    const loanWithDate = {
+      ...newLoan,
+      requestDate: new Date().toISOString(), // Add the current date as the request date
+    };
+    setLoans((prevLoans) => [...prevLoans, loanWithDate]);
+  };
 
   const handleSettleAccount = (id: number) => {
     setLoans((prevLoans) => {
@@ -107,7 +98,12 @@ export default function PerfilBeneficiario() {
           </Tabs>
 
           <Box sx={{ marginTop: 2 }}>
-            {activeTab === 0 && <RequestLoan />}
+            {activeTab === 0 && (
+              <RequestLoan
+                onRequestLoan={handleRequestLoan}
+                currentLoanCount={loans.length} // Pass the number of current loans
+              />
+            )}
             {activeTab === 1 && (
               <SettleAccount
                 loans={loans}
