@@ -14,6 +14,12 @@ const MenuComponent: React.FC<MenuComponentProps> = ({
   anchorEl,
   handleMenuClose,
 }) => {
+  const handleStatisticsClick = () => {
+    // Aquí puedes manejar la lógica para mostrar las estadísticas
+
+    console.log("Mostrar estadísticas");
+    handleMenuClose(); // Cierra el menú después de hacer clic
+  };
   return (
     <Menu
       anchorEl={anchorEl}
