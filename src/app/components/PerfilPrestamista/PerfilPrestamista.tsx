@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import WalletOptions from "./WalletOptions";
-import WithdrawOption from "./WithdrawOption";
+import WithdrawOption from "./WithdrawOption"; // Importar el componente de retiro
 import PrestamosActuales from "./PrestamosActuales";
 import CopToAvaxConverter, { fetchAvaxPriceInCOP } from "../CopToAvaxConverter"; // Import the conversion function
 
