@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -12,7 +12,7 @@ export interface Loan {
   amount: number;
   term: string;
   status: string;
-  requestDate: string; // Added requestDate
+  requestDate: string; // Date when the loan was requested
 }
 
 export default function PerfilBeneficiario() {
@@ -52,6 +52,26 @@ export default function PerfilBeneficiario() {
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
+
+  // Logic to update loans to "Atrasado" if they are overdue
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLoans((prevLoans) =>
+        prevLoans.map((loan) => {
+          const dueDate = new Date(loan.requestDate);
+          const termDays = parseInt(loan.term.split(" ")[0], 10); // Extract the number of days from the term
+          dueDate.setDate(dueDate.getDate() + termDays);
+
+          if (loan.status === "Pendiente" && new Date() > dueDate) {
+            return { ...loan, status: "Atrasado" }; // Update status to "Atrasado"
+          }
+          return loan;
+        })
+      );
+    }, 86400000); // Check every 24 hours (24 * 60 * 60 * 1000 ms)
+
+    return () => clearInterval(interval); // Cleanup interval on component unmount
+  }, []);
 
   return (
     <Box
