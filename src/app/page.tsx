@@ -13,6 +13,7 @@ import PerfilPrestamista from "./components/PerfilPrestamista/PerfilPrestamista"
 import PerfilBeneficiario from "./components/PerfilBeneficiario/PerfilBeneficiario";
 import Dashboard from "./components/Statistics/Dashboard";
 import { ToastContainer } from "react-toastify";
+import { MoralisProvider, useMoralis } from "react-moralis";
 
 export default function Home() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -40,82 +41,91 @@ export default function Home() {
     );
     setActiveView("perfil");
   };
+  const { isWeb3Enabled, chainId } = useMoralis();
 
   return (
-    <Box sx={{ backgroundColor: "black", color: "white", minHeight: "100vh" }}>
-      <AppBar position="fixed" sx={{ backgroundColor: "black", zIndex: 1200 }}>
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={handleMenuOpen}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            NFT Whitelist DApp
-          </Typography>
-          <Button
-            onClick={toggleProfileType}
-            variant="outlined"
-            sx={{ color: "white", borderColor: "white" }}
-          >
-            {profileType}
-          </Button>
-        </Toolbar>
-      </AppBar>
-
-      <Box>
-        <Box sx={(theme) => theme.mixins.toolbar} />
-
-        <Box sx={{ p: 2 }}>
-          {/* Eliminado el saldo duplicado */}
-
-          <MenuComponent
-            anchorEl={anchorEl}
-            handleMenuClose={handleMenuClose}
-            onWalletClick={() => setActiveView("perfil")}
-            onProfileClick={() => setActiveView("usuario")}
-            onStatisticsClick={() => setActiveView("estadisticas")}
-            profileType={profileType}
-          />
-          <Box sx={{ p: 1 }}></Box>
-          {activeView === "perfil" &&
-            (profileType === "Perfil Prestamista" ? (
-              <PerfilPrestamista
-                accountBalance={accountBalance}
-                setAccountBalance={setAccountBalance}
-              />
-            ) : (
-              <PerfilBeneficiario />
-            ))}
-
-          {activeView === "estadisticas" &&
-            profileType === "Perfil Prestamista" && (
-              <>
-                <Box textAlign="right" mb={2}>
-                  <Button
-                    variant="outlined"
-                    color="inherit"
-                    onClick={() => setActiveView("perfil")}
-                  >
-                    Volver
-                  </Button>
-                </Box>
-                <Dashboard profileType={profileType} />
-              </>
+    <MoralisProvider initializeOnMount={false}>
+      {isWeb3Enabled ? (
+      <Box sx={{ backgroundColor: "black", color: "white", minHeight: "100vh" }}>
+          <AppBar position="fixed" sx={{ backgroundColor: "black", zIndex: 1200 }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={handleMenuOpen}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" sx={{ flexGrow: 1 }}>
+              NFT Whitelist DApp
+            </Typography>
+            <Button
+              onClick={toggleProfileType}
+              variant="outlined"
+              sx={{ color: "white", borderColor: "white" }}
+            >
+              {profileType}
+            </Button>
+          </Toolbar>
+        </AppBar>
+  
+        <Box>
+          <Box sx={(theme) => theme.mixins.toolbar} />
+  
+          <Box sx={{ p: 2 }}>
+            {/* Eliminado el saldo duplicado */}
+  
+            <MenuComponent
+              anchorEl={anchorEl}
+              handleMenuClose={handleMenuClose}
+              onWalletClick={() => setActiveView("perfil")}
+              onProfileClick={() => setActiveView("usuario")}
+              onStatisticsClick={() => setActiveView("estadisticas")}
+              profileType={profileType}
+            />
+            <Box sx={{ p: 1 }}></Box>
+            {activeView === "perfil" &&
+              (profileType === "Perfil Prestamista" ? (
+                <PerfilPrestamista
+                  accountBalance={accountBalance}
+                  setAccountBalance={setAccountBalance}
+                />
+              ) : (
+                <PerfilBeneficiario />
+              ))}
+  
+            {activeView === "estadisticas" &&
+              profileType === "Perfil Prestamista" && (
+                <>
+                  <Box textAlign="right" mb={2}>
+                    <Button
+                      variant="outlined"
+                      color="inherit"
+                      onClick={() => setActiveView("perfil")}
+                    >
+                      Volver
+                    </Button>
+                  </Box>
+                  <Dashboard profileType={profileType} />
+                </>
+              )}
+  
+            {activeView === "usuario" && (
+              <Box>
+                <Typography variant="h5">Perfil del Usuario</Typography>
+              </Box>
             )}
-
-          {activeView === "usuario" && (
-            <Box>
-              <Typography variant="h5">Perfil del Usuario</Typography>
-            </Box>
-          )}
+          </Box>
         </Box>
-      </Box>
-
-      <ToastContainer />
-    </Box>
+  
+        <ToastContainer />
+        </Box>
+        ) : (
+          <div>Please connect to a Wallet</div>
+        )}
+      
+      
+    </MoralisProvider>
   );
 }

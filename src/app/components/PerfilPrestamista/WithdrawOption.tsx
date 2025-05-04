@@ -1,8 +1,10 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import {GenericToast} from "@/app/components/comun/GenericToast";
+import { repayLoan } from "@/app/web3Functions/loanContract";
 import Typography from "@mui/material/Typography";
-import { GenericToast } from "@/app/components/comun/GenericToast";
 import { fetchAvaxPriceInCOP } from "../CopToAvaxConverter"; // Import the conversion function
 
 interface WithdrawOptionProps {
