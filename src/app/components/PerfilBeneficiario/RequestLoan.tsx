@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -12,11 +12,12 @@ import {
 } from "@mui/material";
 import FormularioAceptacion from "@/app/components/Forms/FormularioAceptacion";
 import { GenericToast } from "@/app/components/comun/GenericToast";
+import { fetchAvaxPriceInCOP } from "../CopToAvaxConverter"; // Import the conversion function
 
 interface RequestLoanProps {
   onRequestLoan: (loan: {
     id: number;
-    amount: number;
+    amount: number; // Amount in AVAX
     term: string;
     status: string;
     requestDate: string;
@@ -28,26 +29,44 @@ interface RequestLoanProps {
 const RequestLoan: React.FC<RequestLoanProps> = ({
   onRequestLoan,
   currentLoanCount,
-  hasOverdueLoans, // Prop to check if there are overdue loans
+  hasOverdueLoans,
 }) => {
-  const [amount, setAmount] = useState<number | "">("");
+  const [copAmount, setCopAmount] = useState<number | "">(""); // Amount in COP
+  const [avaxAmount, setAvaxAmount] = useState<number | null>(null); // Equivalent in AVAX
   const [termDays, setTermDays] = useState<number>(15);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success"
   );
-
   const [modalOpen, setModalOpen] = useState(false);
   const [pendingLoan, setPendingLoan] = useState<null | {
     id: number;
-    amount: number;
+    amount: number; // Amount in AVAX
     term: string;
     status: string;
     requestDate: string;
   }>(null);
+  const [avaxPriceCOP, setAvaxPriceCOP] = useState<number | null>(null); // Conversion rate
 
   const { SuccessNotify, ErrorNotify } = GenericToast();
+
+  // Fetch the AVAX price in COP when the component mounts
+  useEffect(() => {
+    const fetchPrice = async () => {
+      const price = await fetchAvaxPriceInCOP();
+      if (price) {
+        setAvaxPriceCOP(price);
+      } else {
+        ErrorNotify("Error al obtener la tasa de cambio COP/AVAX.");
+      }
+    };
+
+    fetchPrice();
+
+    const interval = setInterval(fetchPrice, 60_000); // Update every 60 seconds
+    return () => clearInterval(interval);
+  }, [ErrorNotify]);
 
   const calculateDueDate = (days: number): string => {
     const dueDate = new Date();
@@ -55,15 +74,22 @@ const RequestLoan: React.FC<RequestLoanProps> = ({
     return dueDate.toLocaleDateString();
   };
 
-  const serviceFeePercentage = 0.05;
-  const serviceFee = amount ? amount * serviceFeePercentage : 0;
-  const totalToPay = amount ? amount + serviceFee : 0;
+  const handleCopAmountChange = (value: number) => {
+    setCopAmount(value);
 
-  const handleTermChange = (days: number) => {
-    setTermDays(days);
+    if (value === 0) {
+      setAvaxAmount(null); // No calcular el equivalente si el valor es 0
+      return;
+    }
+
+    if (avaxPriceCOP && value > 0) {
+      setAvaxAmount(value / avaxPriceCOP); // Convertir COP a AVAX
+    } else {
+      setAvaxAmount(null); // No mostrar el equivalente si no hay tasa de cambio
+    }
   };
 
-  const handleRequestLoan = () => {
+  const handleRequestLoan = async () => {
     // Check if the beneficiary has overdue loans
     if (hasOverdueLoans) {
       ErrorNotify(
@@ -86,11 +112,31 @@ const RequestLoan: React.FC<RequestLoanProps> = ({
       return;
     }
 
+    // Fetch the AVAX price in COP when the button is clicked
+    if (!avaxPriceCOP) {
+      const price = await fetchAvaxPriceInCOP();
+      if (price) {
+        setAvaxPriceCOP(price);
+      } else {
+        ErrorNotify("Error al obtener la tasa de cambio COP/AVAX.");
+        setSnackbarMessage("Error al obtener la tasa de cambio COP/AVAX.");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+        return;
+      }
+    }
+
     // Validate the loan amount
-    if (amount && amount >= 100 && amount <= 1000) {
+    if (
+      copAmount &&
+      copAmount >= 10000 && // Minimum amount
+      copAmount <= 150000 && // Maximum amount
+      avaxPriceCOP
+    ) {
+      const avaxEquivalent = copAmount / avaxPriceCOP; // Convert COP to AVAX
       const newLoan = {
         id: Date.now(),
-        amount,
+        amount: avaxEquivalent, // Store the equivalent in AVAX
         term: `${termDays} días (vence el ${calculateDueDate(termDays)})`,
         status: "Pendiente",
         requestDate: new Date().toLocaleDateString(),
@@ -98,9 +144,11 @@ const RequestLoan: React.FC<RequestLoanProps> = ({
       setPendingLoan(newLoan);
       setModalOpen(true);
     } else {
-      ErrorNotify("Por favor, ingresa un monto válido entre $100 y $1000.");
+      ErrorNotify(
+        "Por favor, ingresa un monto válido entre $10,000 y $150,000 COP."
+      );
       setSnackbarMessage(
-        "Por favor, ingresa un monto válido entre $100 y $1000."
+        "Por favor, ingresa un monto válido entre $10,000 y $150,000 COP."
       );
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
@@ -113,19 +161,17 @@ const RequestLoan: React.FC<RequestLoanProps> = ({
       onRequestLoan(pendingLoan);
       SuccessNotify("Préstamo solicitado correctamente");
       setSnackbarMessage(
-        `Monto: $${pendingLoan.amount}\n` +
-          `Plazo: ${pendingLoan.term}\n` +
-          `Tarifa: $${(pendingLoan.amount * serviceFeePercentage).toFixed(
-            2
-          )}\n` +
-          `Total a pagar: $${(pendingLoan.amount * 1.05).toFixed(2)}`
+        `Monto solicitado: ${copAmount} COP\n` +
+          `Equivalente en AVAX: ${pendingLoan.amount.toFixed(4)} AVAX\n` +
+          `Plazo: ${pendingLoan.term}`
       );
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
 
       setPendingLoan(null);
-      setAmount("");
-      handleTermChange(15);
+      setCopAmount("");
+      setAvaxAmount(null);
+      setTermDays(15);
       setModalOpen(false);
     }
   };
@@ -154,42 +200,40 @@ const RequestLoan: React.FC<RequestLoanProps> = ({
       </Typography>
 
       <TextField
-        label="Monto solicitado ($)"
+        label="Monto solicitado (COP)"
         fullWidth
-        value={amount}
-        onChange={(e) => setAmount(Number(e.target.value))}
+        value={copAmount}
+        onChange={(e) => handleCopAmountChange(Number(e.target.value))}
         InputLabelProps={{
-          style: { color: "#000" }, // Color del label
+          style: { color: "#000" }, // Label color
         }}
         InputProps={{
-          style: { color: "#000" }, // Color del texto ingresado
+          style: { color: "#000" }, // Input text color
         }}
       />
+
+      <Typography>
+        <strong>Equivalente en AVAX:</strong>{" "}
+        {avaxAmount !== null ? `${avaxAmount.toFixed(4)} AVAX` : "Cargando..."}
+      </Typography>
 
       <TextField
         select
         label="Plazo del préstamo"
         value={termDays}
-        onChange={(e) => handleTermChange(Number(e.target.value))}
+        onChange={(e) => setTermDays(Number(e.target.value))}
         fullWidth
       >
         <MenuItem value={15}>15 días</MenuItem>
         <MenuItem value={30}>30 días</MenuItem>
       </TextField>
 
-      <Typography>
-        <strong>Tarifa por servicio:</strong> ${serviceFee.toFixed(2)}
-      </Typography>
-      <Typography>
-        <strong>Monto total a pagar:</strong> ${totalToPay.toFixed(2)}
-      </Typography>
-
       <Button
         variant="contained"
         color="primary"
         onClick={handleRequestLoan}
         fullWidth
-        disabled={amount === "" || amount === null}
+        disabled={copAmount === "" || copAmount === null || avaxAmount === null}
       >
         Solicitar Préstamo
       </Button>

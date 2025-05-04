@@ -78,9 +78,9 @@ const SettleAccount: React.FC<SettleAccountProps> = ({
           .filter((loan) => loan.status === "Pendiente") // Only show pending loans
           .map((loan) => (
             <MenuItem key={loan.id} value={loan.id}>
-              {`ID: ${loan.id} - Amount: $${loan.amount.toFixed(2)} - Term: ${
-                loan.term
-              }`}
+              {`ID: ${loan.id} - Amount: ${loan.amount.toFixed(
+                2
+              )} AVAX - Term: ${loan.term}`}
             </MenuItem>
           ))}
       </TextField>

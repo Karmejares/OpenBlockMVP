@@ -43,7 +43,7 @@ const RequestedLoans: React.FC<RequestedLoansProps> = ({ loans }) => {
               {loans.map((loan) => (
                 <TableRow key={loan.id}>
                   <TableCell>{loan.id}</TableCell>
-                  <TableCell>${loan.amount.toFixed(2)}</TableCell>
+                  <TableCell>{loan.amount.toFixed(2)} AVAX</TableCell>
                   <TableCell>{loan.requestDate}</TableCell>
                   <TableCell>{loan.term}</TableCell>
                   <TableCell>{loan.status}</TableCell>

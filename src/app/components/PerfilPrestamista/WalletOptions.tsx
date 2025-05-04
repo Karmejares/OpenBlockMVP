@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Divider from "@mui/material/Divider";
 import { GenericToast } from "@/app/components/comun/GenericToast";
+import { fetchAvaxPriceInCOP } from "../CopToAvaxConverter"; // Import the conversion function
 
 interface WalletOptionsProps {
   profileType: string;
@@ -18,15 +19,43 @@ const WalletOptions: React.FC<WalletOptionsProps> = ({
   setAccountBalance,
 }) => {
   const [depositAmount, setDepositAmount] = useState("");
+  const [avaxPriceCOP, setAvaxPriceCOP] = useState<number | null>(null);
+  const { SuccessNotify, ErrorNotify } = GenericToast();
 
-  const { SuccessNotify } = GenericToast();
+  // Fetch the AVAX price in COP when the component mounts
+  useEffect(() => {
+    const fetchPrice = async () => {
+      const price = await fetchAvaxPriceInCOP();
+      if (price) {
+        setAvaxPriceCOP(price);
+      } else {
+        ErrorNotify("Error al obtener la tasa de cambio COP/AVAX.");
+      }
+    };
+
+    fetchPrice();
+
+    const interval = setInterval(fetchPrice, 60_000); // Update every 60 seconds
+    return () => clearInterval(interval);
+  }, [ErrorNotify]);
 
   const handleDeposit = () => {
     const deposit = parseFloat(depositAmount);
     if (!isNaN(deposit) && deposit > 0) {
-      setAccountBalance((prev) => prev + deposit); // Update balance in parent component
-      setDepositAmount("");
-      SuccessNotify("Se ha depositado correctamente al saldo disponible");
+      if (avaxPriceCOP) {
+        const avaxAmount = deposit / avaxPriceCOP; // Convert COP to AVAX
+        setAccountBalance((prev) => prev + avaxAmount); // Update balance in AVAX
+        setDepositAmount("");
+        SuccessNotify(
+          `Se ha depositado correctamente ${avaxAmount.toFixed(
+            4
+          )} AVAX al saldo disponible.`
+        );
+      } else {
+        ErrorNotify("No se pudo realizar la conversión. Intenta nuevamente.");
+      }
+    } else {
+      ErrorNotify("Por favor, ingresa un monto válido para depositar.");
     }
   };
 
@@ -56,14 +85,14 @@ const WalletOptions: React.FC<WalletOptionsProps> = ({
       }}
     >
       <Typography variant="h6" sx={{ marginBottom: 2, textAlign: "center" }}>
-        Opciones de Wallet ({profileType})
+        Opciones de Wallet
       </Typography>
       <Divider sx={{ marginBottom: 2 }} />
       {profileType === "Perfil Prestamista" ? (
         <>
           <Typography variant="body1" sx={{ marginBottom: 2 }}>
             Saldo Disponible en la cuenta:{" "}
-            <strong>${accountBalance.toFixed(2)}</strong>
+            <strong>{accountBalance.toFixed(4)} AVAX</strong>
           </Typography>
           <Box
             sx={{
@@ -74,7 +103,7 @@ const WalletOptions: React.FC<WalletOptionsProps> = ({
             }}
           >
             <TextField
-              label="Monto a depositar"
+              label="Monto a depositar (COP)"
               variant="outlined"
               size="small"
               value={depositAmount}
@@ -85,7 +114,9 @@ const WalletOptions: React.FC<WalletOptionsProps> = ({
               variant="contained"
               color="primary"
               onClick={handleDeposit}
-              disabled={depositAmount == "" || depositAmount == null}
+              disabled={
+                depositAmount === "" || depositAmount === null || !avaxPriceCOP
+              }
               fullWidth
             >
               Depositar

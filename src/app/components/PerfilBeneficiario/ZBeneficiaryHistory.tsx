@@ -41,7 +41,7 @@ const ZBeneficiaryHistory: React.FC<ZBeneficiaryHistoryProps> = ({ loans }) => {
                 {loans.map((prestamo) => (
                   <TableRow key={prestamo.id}>
                     <TableCell>{prestamo.id}</TableCell>
-                    <TableCell>${prestamo.amount.toFixed(2)}</TableCell>
+                    <TableCell>{prestamo.amount.toFixed(2)} AVAX</TableCell>
                     <TableCell>{prestamo.requestDate}</TableCell>
                     <TableCell>{prestamo.term}</TableCell>
                     <TableCell>{prestamo.status}</TableCell>
