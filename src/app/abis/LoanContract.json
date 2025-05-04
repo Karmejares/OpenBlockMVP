@@ -1,0 +1,70 @@
+[
+    {
+      "inputs": [],
+      "name": "deposit",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "_amount", "type": "uint256" },
+        { "internalType": "address", "name": "prestamista", "type": "address" },
+        { "internalType": "uint8", "name": "classTasa", "type": "uint8" }
+      ],
+      "name": "borrow",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "_loanId", "type": "uint256" }
+      ],
+      "name": "payLoan",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "prestador", "type": "address" },
+        { "indexed": false, "internalType": "uint256", "name": "valor", "type": "uint256" }
+      ],
+      "name": "DepositIn",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "borrower", "type": "address" }
+      ],
+      "name": "LoanOut",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "borrower", "type": "address" }
+      ],
+      "name": "Pay_Loan",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "prestador", "type": "address" }
+      ],
+      "name": "DepositMod",
+      "type": "event"
+    }
+  ]
+  

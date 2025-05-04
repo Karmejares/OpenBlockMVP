@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Divider from "@mui/material/Divider";
 import {GenericToast} from "@/app/components/comun/GenericToast";
+import { repayLoan } from "@/app/web3Functions/loanContract";
 
 interface WalletOptionsProps {
   profileType: string;

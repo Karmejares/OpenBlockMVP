@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { GenericToast } from "@/app/components/comun/GenericToast";
+import { repayLoan } from "@/app/web3Functions/loanContract"; // Import the repayLoan function
 
 interface Loan {
   id: number;
