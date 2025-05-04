@@ -91,6 +91,7 @@ export default function PerfilBeneficiario() {
             borderRadius: 2,
             boxShadow: 3,
             padding: 3,
+            height: "70vh", // Ensure consistent height
             color: "black",
           }}
         >
@@ -115,6 +116,7 @@ export default function PerfilBeneficiario() {
             )}
           </Box>
         </Box>
+
         {/* Requested Loans */}
         <Box
           sx={{
@@ -123,8 +125,8 @@ export default function PerfilBeneficiario() {
             backgroundColor: "white",
             borderRadius: 2,
             boxShadow: 3,
-            height: "65vh",
             padding: 3,
+            height: "70vh", // Ensure consistent height
             color: "black",
           }}
         >
