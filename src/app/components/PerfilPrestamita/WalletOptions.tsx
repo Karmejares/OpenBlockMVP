@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
+import Divider from "@mui/material/Divider";
 
 interface WalletOptionsProps {
   profileType: string;
@@ -20,19 +21,19 @@ const WalletOptions: React.FC<WalletOptionsProps> = ({
   const handleDeposit = () => {
     const deposit = parseFloat(depositAmount);
     if (!isNaN(deposit) && deposit > 0) {
-      setAccountBalance((prev) => prev + deposit); // Actualiza el saldo en el componente padre
+      setAccountBalance((prev) => prev + deposit); // Update balance in parent component
       setDepositAmount("");
     }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    // Permitir solo números, backspace, y teclas de navegación
+    // Allow only numbers, backspace, and navigation keys
     if (
-      !/[0-9]/.test(event.key) && // Permitir números v
-      event.key !== "Backspace" && // Permitir borrar
-      event.key !== "ArrowLeft" && // Permitir mover el cursor a la izquierda
-      event.key !== "ArrowRight" && // Permitir mover el cursor a la derecha
-      event.key !== "Delete" // Permitir borrar hacia adelante
+      !/[0-9]/.test(event.key) &&
+      event.key !== "Backspace" &&
+      event.key !== "ArrowLeft" &&
+      event.key !== "ArrowRight" &&
+      event.key !== "Delete"
     ) {
       event.preventDefault();
     }
@@ -41,22 +42,32 @@ const WalletOptions: React.FC<WalletOptionsProps> = ({
   return (
     <Box
       sx={{
-        padding: 2,
+        padding: 3,
         backgroundColor: "white",
         borderRadius: 2,
+        boxShadow: 3,
         color: "black",
+        maxWidth: 400,
+        margin: "auto",
       }}
     >
-      <Typography variant="h6" sx={{ marginBottom: 2 }}>
+      <Typography variant="h6" sx={{ marginBottom: 2, textAlign: "center" }}>
         Opciones de Wallet ({profileType})
       </Typography>
+      <Divider sx={{ marginBottom: 2 }} />
       {profileType === "Perfil Prestamista" ? (
         <>
-          <Typography variant="body1" sx={{ marginBottom: 1 }}>
-            Saldo Disponible en la cuenta: ${accountBalance.toFixed(2)}
+          <Typography variant="body1" sx={{ marginBottom: 2 }}>
+            Saldo Disponible en la cuenta:{" "}
+            <strong>${accountBalance.toFixed(2)}</strong>
           </Typography>
           <Box
-            sx={{ display: "flex", alignItems: "center", gap: 1, marginTop: 2 }}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              alignItems: "center",
+            }}
           >
             <TextField
               label="Monto a depositar"
@@ -64,15 +75,21 @@ const WalletOptions: React.FC<WalletOptionsProps> = ({
               size="small"
               value={depositAmount}
               onChange={(e) => setDepositAmount(e.target.value)}
-              onKeyDown={handleKeyDown} // Filtrar las teclas permitidas
+              onKeyDown={handleKeyDown} // Filter allowed keys
+              fullWidth
             />
-            <Button variant="contained" color="primary" onClick={handleDeposit}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleDeposit}
+              fullWidth
+            >
               Depositar
             </Button>
           </Box>
         </>
       ) : (
-        <Typography variant="body1">
+        <Typography variant="body1" sx={{ textAlign: "center" }}>
           Cambia al perfil de Prestamista para ver las opciones de la wallet.
         </Typography>
       )}

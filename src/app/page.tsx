@@ -8,13 +8,17 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Box from "@mui/material/Box";
 import MenuComponent from "./components/MenuComponent";
+import PrestamosActuales from "./components/PerfilPrestamita/PrestamosActuales";
 import WalletOptions from "./components/PerfilPrestamita/WalletOptions";
 import WithdrawOption from "./components/PerfilPrestamita/WithdrawOption";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
 
 export default function Home() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [profileType, setProfileType] = useState("Perfil Prestamista");
   const [accountBalance, setAccountBalance] = useState(1000); // Monto inicial
+  const [activeTab, setActiveTab] = useState(0); // Tab activa para Depositar/Retirar
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -30,6 +34,10 @@ export default function Home() {
         ? "Perfil Prestamista"
         : "Perfil Beneficiario de Crédito"
     );
+  };
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
   };
 
   return (
@@ -63,18 +71,90 @@ export default function Home() {
         </Toolbar>
       </AppBar>
       <MenuComponent anchorEl={anchorEl} handleMenuClose={handleMenuClose} />
-      <Box sx={{ padding: 4 }}>
-        <WalletOptions
-          profileType={profileType}
-          accountBalance={accountBalance}
-          setAccountBalance={setAccountBalance}
-        />
+
+      {/* Saldo actual y operaciones */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "50vh", // Ocupa la mitad superior de la pantalla
+          padding: 4,
+        }}
+      >
+        {profileType === "Perfil Prestamista" && (
+          <Typography variant="h5" sx={{ marginBottom: 2 }}>
+            Saldo Actual: ${accountBalance.toFixed(2)}
+          </Typography>
+        )}
+        {profileType === "Perfil Prestamista" && (
+          <Box
+            sx={{
+              width: "100%",
+              maxWidth: 500,
+              backgroundColor: "white",
+              borderRadius: 2,
+              color: "black",
+            }}
+          >
+            <Tabs
+              value={activeTab}
+              onChange={handleTabChange}
+              variant="fullWidth"
+              textColor="primary"
+              indicatorColor="primary"
+            >
+              <Tab label="Depositar" />
+              <Tab label="Retirar" />
+            </Tabs>
+            <Box sx={{ padding: 2 }}>
+              {activeTab === 0 ? (
+                <WalletOptions
+                  profileType={profileType}
+                  accountBalance={accountBalance}
+                  setAccountBalance={setAccountBalance}
+                />
+              ) : (
+                <WithdrawOption
+                  accountBalance={accountBalance}
+                  setAccountBalance={setAccountBalance}
+                />
+              )}
+            </Box>
+          </Box>
+        )}
       </Box>
-      {profileType === "Perfil Prestamista" && ( // Mostrar solo si es perfil prestamista
-        <Box sx={{ padding: 4 }}>
-          <WithdrawOption
-            accountBalance={accountBalance}
-            setAccountBalance={setAccountBalance}
+
+      {/* Historial de préstamos */}
+      {profileType === "Perfil Prestamista" && (
+        <Box
+          sx={{
+            padding: 4,
+            backgroundColor: "#1c1c1c",
+            borderTop: "1px solid #333",
+          }}
+        >
+          <Typography variant="h6" sx={{ marginBottom: 2 }}>
+            Historial de Préstamos
+          </Typography>
+          <PrestamosActuales
+            prestamos={[
+              {
+                id: 1,
+                monto: 500,
+                fechaDeInicio: "2023-10-01",
+                fechaDeFin: "2023-11-01",
+                estado: "Activo",
+              },
+              {
+                id: 2,
+                monto: 300,
+                fechaDeInicio: "2023-10-05",
+                fechaDeFin: "2023-10-20",
+                estado: "Pagado",
+              },
+            ]}
           />
         </Box>
       )}
